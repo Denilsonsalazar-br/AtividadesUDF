@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mapa mental SQL</title>
+<style>
+:root{
+  --bg:#f5f5f7; --ink:#1d1d1f; --muted:#6e6e73; --line:#c7c7cc; --card:#fff;
+  --c1:#0a84ff; --c2:#ff9f0a; --c3:#30b455; --c4:#bf5af2; --c5:#ff453a; --c6:#00a8b5;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#000;--ink:#f5f5f7;--muted:#98989d;--line:#48484a;--card:#1c1c1e;
+  --c1:#0a84ff;--c2:#ff9f0a;--c3:#32d74b;--c4:#bf5af2;--c5:#ff453a;--c6:#40c8e0}
+}
+:root[data-theme="dark"]{--bg:#000;--ink:#f5f5f7;--muted:#98989d;--line:#48484a;--card:#1c1c1e;
+  --c1:#0a84ff;--c2:#ff9f0a;--c3:#32d74b;--c4:#bf5af2;--c5:#ff453a;--c6:#40c8e0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",Roboto,sans-serif;padding:20px 16px 48px}
+main{max-width:560px;margin:0 auto}
+.root{display:block;margin:8px auto 0;width:max-content;max-width:100%;background:var(--ink);color:var(--bg);font-weight:700;font-size:22px;padding:14px 28px;border-radius:999px;text-align:center}
+.hint{text-align:center;color:var(--muted);font-size:14px;margin:10px 0 0}
+.trunk{margin:14px 0 0 24px;border-left:3px solid var(--line);padding-left:0}
+.branch{position:relative;margin:0 0 14px 0;padding-left:22px}
+.branch::before{content:"";position:absolute;left:0;top:22px;width:22px;border-top:3px solid var(--line)}
+.bh{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;background:var(--c);color:#fff;font-weight:700;font-size:17px;padding:10px 18px;border-radius:999px;-webkit-tap-highlight-color:transparent}
+.bh:focus-visible,.leaf:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.bh small{font-weight:500;opacity:.9;font-size:13px}
+.chev{display:inline-block;transition:transform .2s}
+.branch.open .chev{transform:rotate(90deg)}
+.kids{display:none;margin:10px 0 0 18px;border-left:3px solid var(--c);padding:2px 0 2px 0}
+.branch.open .kids{display:block}
+.kid{position:relative;padding:5px 0 5px 18px}
+.kid::before{content:"";position:absolute;left:0;top:23px;width:18px;border-top:3px solid var(--c)}
+.leaf{all:unset;cursor:pointer;display:inline-block;max-width:100%;background:color-mix(in srgb,var(--c) 16%,var(--card));border:2px solid var(--c);color:var(--ink);padding:7px 14px;border-radius:16px;font-size:15px;-webkit-tap-highlight-color:transparent}
+.leaf b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14.5px}
+.leaf span{color:var(--muted)}
+.ex{display:none;margin:8px 0 2px;background:var(--card);border-radius:14px;padding:10px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;overflow-x:auto;white-space:pre;border:1px solid var(--line)}
+.kid.open .ex{display:block}
+.bar{display:flex;gap:8px;justify-content:center;margin:16px 0 4px}
+.bar button{all:unset;cursor:pointer;background:var(--card);border:1px solid var(--line);padding:7px 14px;border-radius:999px;font-size:14px}
+.bar button:focus-visible{outline:3px solid var(--ink)}
+</style>
+</head>
+<body>
+<main>
+  <div class="root">SQL 🧠</div>
+  <p class="hint">Toque num ramo para abrir e num comando para ver o exemplo.</p>
+  <div class="bar"><button id="all">Abrir tudo</button><button id="none">Fechar tudo</button></div>
+  <div class="trunk" id="map"></div>
+</main>
+<script>
+var D=[
+{t:"1. Ler dados",s:"consultar",c:"--c1",k:[
+ ["SELECT","escolhe as colunas","SELECT nome, cidade\nFROM clientes;"],
+ ["FROM","diz de qual tabela","SELECT * FROM clientes;"],
+ ["WHERE","filtra as linhas","SELECT * FROM clientes\nWHERE cidade = 'Brasília';"],
+ ["ORDER BY","ordena o resultado","SELECT * FROM clientes\nORDER BY nome ASC;  -- DESC = inverso"],
+ ["LIMIT","limita quantas linhas","SELECT * FROM clientes\nLIMIT 5;"],
+ ["DISTINCT","remove repetidos","SELECT DISTINCT cidade\nFROM clientes;"],
+ ["AS","dá apelido à coluna","SELECT nome AS cliente\nFROM clientes;"]]},
+{t:"2. Filtros do WHERE",s:"condições",c:"--c2",k:[
+ ["= <> > < >= <=","comparar valores","WHERE idade >= 18"],
+ ["AND","as duas verdadeiras","WHERE cidade = 'Goiânia'\n  AND idade > 30"],
+ ["OR","uma das duas","WHERE cidade = 'Goiânia'\n   OR cidade = 'Brasília'"],
+ ["NOT","nega a condição","WHERE NOT cidade = 'Goiânia'"],
+ ["IN","está numa lista","WHERE cidade IN ('Goiânia','Brasília')"],
+ ["BETWEEN","entre dois valores","WHERE idade BETWEEN 20 AND 30"],
+ ["LIKE","busca por padrão","WHERE nome LIKE 'Ma%'  -- começa com Ma\nWHERE nome LIKE '%a'   -- termina com a"],
+ ["IS NULL","campo vazio","WHERE telefone IS NULL"]]},
+{t:"3. Resumir dados",s:"contas e grupos",c:"--c3",k:[
+ ["COUNT","conta linhas","SELECT COUNT(*) FROM clientes;"],
+ ["SUM","soma","SELECT SUM(valor) FROM pedidos;"],
+ ["AVG","média","SELECT AVG(valor) FROM pedidos;"],
+ ["MIN / MAX","menor / maior","SELECT MAX(valor) FROM pedidos;"],
+ ["GROUP BY","agrupa linhas","SELECT cidade, COUNT(*)\nFROM clientes\nGROUP BY cidade;"],
+ ["HAVING","filtra os grupos","SELECT cidade, COUNT(*)\nFROM clientes\nGROUP BY cidade\nHAVING COUNT(*) > 3;"]]},
+{t:"4. Juntar tabelas",s:"JOIN",c:"--c4",k:[
+ ["INNER JOIN","só o que combina nas duas","SELECT c.nome, p.valor\nFROM clientes c\nINNER JOIN pedidos p\n  ON p.cliente_id = c.id;"],
+ ["LEFT JOIN","tudo da esquerda + combinações","SELECT c.nome, p.valor\nFROM clientes c\nLEFT JOIN pedidos p\n  ON p.cliente_id = c.id;"],
+ ["RIGHT JOIN","tudo da direita + combinações","SELECT c.nome, p.valor\nFROM clientes c\nRIGHT JOIN pedidos p\n  ON p.cliente_id = c.id;"],
+ ["ON","a regra que liga as tabelas","ON p.cliente_id = c.id"]]},
+{t:"5. Mexer nos dados",s:"escrever",c:"--c5",k:[
+ ["INSERT INTO","adiciona linha","INSERT INTO clientes (nome, cidade)\nVALUES ('Ana', 'Brasília');"],
+ ["UPDATE","altera linhas","UPDATE clientes\nSET cidade = 'Goiânia'\nWHERE id = 1;"],
+ ["DELETE","apaga linhas","DELETE FROM clientes\nWHERE id = 1;"],
+ ["⚠️ Sempre use WHERE","sem ele afeta TUDO","-- UPDATE e DELETE sem WHERE\n-- mudam/apagam a tabela inteira!"]]},
+{t:"6. Estrutura",s:"bancos e tabelas",c:"--c6",k:[
+ ["CREATE DATABASE","cria um banco","CREATE DATABASE loja;"],
+ ["USE","escolhe o banco","USE loja;"],
+ ["CREATE TABLE","cria uma tabela","CREATE TABLE clientes (\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  nome VARCHAR(100),\n  cidade VARCHAR(50)\n);"],
+ ["ALTER TABLE","muda a tabela","ALTER TABLE clientes\nADD COLUMN email VARCHAR(100);"],
+ ["DROP TABLE","apaga a tabela","DROP TABLE clientes;"],
+ ["PRIMARY KEY","identificador único","id INT PRIMARY KEY"],
+ ["FOREIGN KEY","liga a outra tabela","FOREIGN KEY (cliente_id)\n  REFERENCES clientes(id)"]]}
+];
+var map=document.getElementById("map");
+D.forEach(function(b){
+  var br=document.createElement("div");br.className="branch";br.style.setProperty("--c","var("+b.c+")");
+  var h=document.createElement("button");h.className="bh";h.setAttribute("aria-expanded","false");
+  h.innerHTML='<span class="chev">▸</span>'+b.t+' <small>'+b.s+'</small>';
+  var kids=document.createElement("div");kids.className="kids";
+  b.k.forEach(function(k){
+    var kid=document.createElement("div");kid.className="kid";
+    var l=document.createElement("button");l.className="leaf";
+    l.innerHTML='<b></b> <span></span>';
+    l.firstChild.textContent=k[0];l.lastChild.textContent="· "+k[1];
+    var ex=document.createElement("div");ex.className="ex";ex.textContent=k[2];
+    l.onclick=function(){kid.classList.toggle("open")};
+    kid.appendChild(l);kid.appendChild(ex);kids.appendChild(kid);
+  });
+  h.onclick=function(){var o=br.classList.toggle("open");h.setAttribute("aria-expanded",o)};
+  br.appendChild(h);br.appendChild(kids);map.appendChild(br);
+});
+function setAll(o){document.querySelectorAll(".branch").forEach(function(b){b.classList.toggle("open",o);b.querySelector(".bh").setAttribute("aria-expanded",o)});if(!o)document.querySelectorAll(".kid").forEach(function(k){k.classList.remove("open")})}
+document.getElementById("all").onclick=function(){setAll(true)};
+document.getElementById("none").onclick=function(){setAll(false)};
+</script>
+</body>
+</html>
